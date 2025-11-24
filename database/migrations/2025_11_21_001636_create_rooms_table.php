@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('gambar')->nullable();
             $table->enum('status', ['tersedia', 'dipesan', 'maintenance'])->default('tersedia');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
