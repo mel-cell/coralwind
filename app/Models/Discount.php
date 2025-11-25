@@ -8,6 +8,10 @@ class Discount extends Model
 {
     protected $fillable = ['nama', 'kode', 'persentase', 'expires_at'];
 
+    protected $casts = [
+        'expires_at' => 'datetime',
+    ];
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_discounts')
