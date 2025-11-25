@@ -20,7 +20,7 @@
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center">
                     <a href="/" class="group">
-                        <img src="{{ asset('storage/logo.png') }}" alt="Coralwind Suites Hotel" class="h-12 w-auto transition-transform group-hover:scale-105">
+                        <img src="{{ asset('storage/app/public/logo.png') }}" alt="Coralwind Suites Hotel" class="h-12 w-auto transition-transform group-hover:scale-105">
                     </a>
                 </div>
                 <div class="flex items-center space-x-8">
