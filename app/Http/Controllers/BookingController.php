@@ -23,6 +23,7 @@ class BookingController extends Controller
             'no_hp' => 'required|string|max:15',
         ]);
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         // Update user's phone number if it's different or empty

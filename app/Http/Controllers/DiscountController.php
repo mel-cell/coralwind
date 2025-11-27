@@ -9,7 +9,10 @@ class DiscountController extends Controller
     public function claim(Request $request, $id)
     {
         $discount = \App\Models\Discount::findOrFail($id);
-        $user = auth()->user();
+        /** @var \Illuminate\Contracts\Auth\Guard $auth */
+        $auth = auth();
+        /** @var \App\Models\User $user */
+        $user = $auth->user();
 
         // Check if already claimed
         if (!$user->discounts()->where('discount_id', $discount->id)->exists()) {
@@ -33,7 +36,10 @@ class DiscountController extends Controller
             return back()->with('error', 'This discount code has expired.');
         }
 
-        $user = auth()->user();
+        /** @var \Illuminate\Contracts\Auth\Guard $auth */
+        $auth = auth();
+        /** @var \App\Models\User $user */
+        $user = $auth->user();
 
         // Check if already claimed
         if ($user->discounts()->where('discount_id', $discount->id)->exists()) {

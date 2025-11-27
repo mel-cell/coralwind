@@ -9,7 +9,7 @@ class DiscountSeeder extends Seeder
 {
     public function run(): void
     {
-        \App\Models\Discount::firstOrCreate(
+        Discount::firstOrCreate(
             ['kode' => 'WELCOME10'],
             [
                 'nama' => 'Welcome Discount',
@@ -18,7 +18,7 @@ class DiscountSeeder extends Seeder
             ]
         );
 
-        \App\Models\Discount::firstOrCreate(
+        Discount::firstOrCreate(
             ['kode' => 'SUMMER20'],
             [
                 'nama' => 'Summer Sale',
@@ -27,7 +27,7 @@ class DiscountSeeder extends Seeder
             ]
         );
 
-        \App\Models\Discount::firstOrCreate(
+        Discount::firstOrCreate(
             ['kode' => 'EXPIRED50'],
             [
                 'nama' => 'Flash Sale (Expired)',
