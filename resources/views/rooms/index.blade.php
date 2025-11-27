@@ -20,8 +20,8 @@
                 </div>
                 
 
-                <div class="relative min-w-[200px]">
-                    <select name="status" class="w-full px-8 py-4 rounded-full border-2 border-primary/30 focus:border-primary focus:ring-0 text-lg shadow-sm outline-none transition-all appearance-none bg-white text-gray-600 cursor-pointer" onchange="this.form.submit()">
+                <div class="relative min-w-auto">
+                    <select name="status" class="w-full px-4 py-4 rounded-full border-2 border-primary/30 focus:border-primary focus:ring-0 text-lg shadow-sm outline-none transition-all appearance-none bg-white text-gray-600 cursor-pointer" onchange="this.form.submit()">
                         <option value="">All Status</option>
                         <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
                         <option value="booked" {{ request('status') == 'booked' ? 'selected' : '' }}>Booked</option>
@@ -48,7 +48,7 @@
                     <!-- Content Overlay -->
                     <div class="absolute bottom-0 left-0 w-full p-8 text-white">
                         <!-- Status Badge -->
-                        <div class="mb-3">
+                        <div class="mb-1">
                             @if($room->availability_status === 'booked')
                                 <span class="bg-red-500/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm">Booked</span>
                             @else
@@ -56,7 +56,8 @@
                             @endif
                         </div>
 
-                        <h3 class="text-3xl font-bold mb-2 leading-tight drop-shadow-md">{{ $room->nama_kamar }}</h3>
+                        <h3 class="text-3xl font-bold leading-tight drop-shadow-md">{{ $room->nama_kamar }}</h3>
+                        <p class="font-bold text-gray-100 bg-[#74A6AF]/50 backdrop-blur-md px-2 py-1 text-xs rounded-full">{{ $room->tipe_kamar }}</p>
                         <div class="text-2xl font-medium mb-2 drop-shadow-sm">
                             Rp {{ number_format($room->harga) }} <span class="text-base font-normal opacity-90">/ Night</span>
                         </div>

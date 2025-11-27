@@ -56,6 +56,13 @@ class DiscountResource extends Resource
                 Tables\Columns\TextColumn::make('expires_at')
                     ->date()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->getStateUsing(fn (Discount $record): string => $record->expires_at && $record->expires_at->isPast() ? 'Expired' : 'Active')
+                    ->colors([
+                        'success' => 'Active',
+                        'danger' => 'Expired',
+                    ]),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -66,10 +73,16 @@ class DiscountResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('active')
+                    ->query(fn (Builder $query): Builder => $query->where('expires_at', '>=', now())->orWhereNull('expires_at'))
+                    ->label('Active Only'),
+                Tables\Filters\Filter::make('expired')
+                    ->query(fn (Builder $query): Builder => $query->where('expires_at', '<', now()))
+                    ->label('Expired Only'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

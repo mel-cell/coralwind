@@ -119,6 +119,17 @@ class MemberHistory extends Component
         }
     }
 
+    public function cancelBooking($bookingId)
+    {
+        $booking = $this->bookings->find($bookingId);
+
+        if ($booking && $booking->status === 'pending') {
+            $booking->update(['status' => 'batal']);
+            $this->loadBookings();
+            session()->flash('message', 'Booking berhasil dibatalkan.');
+        }
+    }
+
     public function render()
     {
         return view('livewire.member-history');

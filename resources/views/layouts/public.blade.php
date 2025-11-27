@@ -46,41 +46,74 @@
                         @php
                             $myCoupons = auth()->user()->discounts()->wherePivot('is_used', false)->get();
                         @endphp
-                        <div class="hidden sm:flex sm:items-center sm:ms-6">
-                            <x-dropdown align="right" width="60">
-                                <x-slot name="trigger">
-                                    <button class="relative p-2 text-gray-400 hover:text-primary transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-                                        </svg>
-                                        @if($myCoupons->count() > 0)
-                                            <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full">{{ $myCoupons->count() }}</span>
-                                        @endif
-                                    </button>
-                                </x-slot>
+                        <div class="hidden sm:flex sm:items-center sm:ms-6" x-data="{ open: false }">
+                            <div class="relative">
+                                <button @click="open = !open" class="relative p-2 text-gray-400 hover:text-primary transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                                    </svg>
+                                    @if($myCoupons->count() > 0)
+                                        <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full">{{ $myCoupons->count() }}</span>
+                                    @endif
+                                </button>
 
-                                <x-slot name="content">
-                                    <div class="px-4 py-3 border-b border-gray-100">
-                                        <p class="text-sm font-bold text-gray-100">My Coupons</p>
-                                    </div>
-                                    @forelse($myCoupons as $coupon)
-                                        <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                                            <div class="flex justify-between items-start">
-                                                <div>
-                                                    <p class="font-bold text-primary">{{ $coupon->nama }}</p>
-                                                    <p class="text-xs text-gray-500">{{ $coupon->persentase }}% OFF</p>
+                                <div x-show="open" 
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                     class="absolute right-0 z-50 mt-2 w-82 origin-top-right rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                     style="display: none;">
+                                    
+                                    <!-- Header & List (Dark Theme) -->
+                                    <div class="bg-[#2d3748] text-white rounded-t-md">
+                                        <div class="px-4 py-3 border-b border-gray-600 flex justify-between items-center">
+                                            <p class="text-sm font-bold">My Coupons</p>
+                                            <button @click="open = false" class="text-gray-400 hover:text-white">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="max-h-60 overflow-y-auto custom-scrollbar">
+                                            @forelse($myCoupons as $coupon)
+                                                <div class="px-4 py-3 border-b border-gray-600 hover:bg-gray-700 transition-colors">
+                                                    <div class="flex justify-between items-start">
+                                                        <div>
+                                                            <p class="font-bold text-yellow-400">{{ $coupon->nama }}</p>
+                                                            <p class="text-xs text-gray-300">{{ $coupon->persentase }}% OFF</p>
+                                                        </div>
+                                                        <span class="bg-gray-600 text-gray-200 text-xs font-mono px-2 py-1 rounded">{{ $coupon->kode }}</span>
+                                                    </div>
+                                                    <p class="text-[10px] text-gray-400 mt-1">Expires: {{ $coupon->expires_at ? $coupon->expires_at->format('d M Y') : 'No Expiry' }}</p>
                                                 </div>
-                                                <span class="bg-gray-100 text-gray-600 text-xs font-mono px-2 py-1 rounded">{{ $coupon->kode }}</span>
+                                            @empty
+                                                <div class="px-4 py-8 text-center">
+                                                    <div class="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                                                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+                                                    </div>
+                                                    <p class="text-sm text-gray-400">No coupons yet.</p>
+                                                </div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Redeem Code Input (Light Theme) -->
+                                    <div class="p-4 bg-gray-100 rounded-b-md">
+                                        <form action="{{ route('discounts.redeem') }}" method="POST">
+                                            @csrf
+                                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wider">Redeem Code</label>
+                                            <div class="flex gap-2">
+                                                <input type="text" name="code" placeholder="Enter code" class="w-4xl px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-primary focus:ring-0 outline-none bg-white text-gray-800 placeholder-gray-400" required>
+                                                <button type="submit" class="bg-[#5E8B94] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#4a6f76] transition-colors shadow-sm">
+                                                    Add
+                                                </button>
                                             </div>
-                                            <p class="text-xs text-gray-400 mt-1">Expires: {{ $coupon->expires_at ? $coupon->expires_at->format('d M Y') : 'No Expiry' }}</p>
-                                        </div>
-                                    @empty
-                                        <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                                            No coupons available.
-                                        </div>
-                                    @endforelse
-                                </x-slot>
-                            </x-dropdown>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Settings Dropdown -->
@@ -133,19 +166,21 @@
         @yield('content')
     </main>
 
-   <footer class="bg-gray-800 text-white pt-12 pb-6 mt-16 shadow-2xl">
+   <footer class="bg-white text-black pt-12 pb-6 mt-16 shadow-2xl">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-b border-gray-700 pb-8 mb-8">
             
             <div>
-                <h3 class="text-xl font-bold text-indigo-400 mb-4">CoralWind Suites Hotel</h3>
-                <p class="text-sm text-gray-400">
+                <a href="/" class="group">
+                        <img src="{{ asset('storage/logo.png') }}" alt="Coralwind Suites Hotel" class="h-12 w-auto transition-transform group-hover:scale-105">
+                    </a>
+                <p class="text-sm text-gray-600">
                     Wake up to the sound of the ocean and enjoy world-class amenities.
                 </p>
             </div>
 
             <div>
-                <h4 class="text-lg font-semibold mb-4 text-gray-200">Navigation</h4>
+                <h4 class="text-lg font-semibold mb-4 text-gray-400">Navigation</h4>
                 <ul class="space-y-2"> 
                     <li><a href="/" class="text-gray-400 hover:text-indigo-400 transition duration-300 text-sm">Home</a></li>
                     <li><a href="/rooms" class="text-gray-400 hover:text-indigo-400 transition duration-300 text-sm">Rooms</a></li>
@@ -154,7 +189,7 @@
             </div>
             
             <div>
-                <h4 class="text-lg font-semibold mb-4 text-gray-200">Hubungi Kami</h4>
+                <h4 class="text-lg font-semibold mb-4 text-gray-400">Hubungi Kami</h4>
                 <ul class="space-y-2 text-sm text-gray-400">
                     <li>Jl. Pantai Indah No. 88, Bali</li>
                     <li>(021) 123-4567</li>
