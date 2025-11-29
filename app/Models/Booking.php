@@ -23,6 +23,7 @@ class Booking extends Model
     protected $casts = [
         'tgl_check_in' => 'date',
         'tgl_check_out' => 'date',
+        'credit_card_number' => 'encrypted',
     ];
 
     public function user()

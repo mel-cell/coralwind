@@ -22,12 +22,12 @@ class RoomController extends Controller
         if ($request->has('status') && $request->status) {
             if ($request->status === 'available') {
                 $query->whereDoesntHave('bookings', function ($q) {
-                    $q->whereIn('status', ['confirmed', 'pending'])
+                    $q->whereIn('status', ['bayar', 'pending'])
                       ->where('tgl_check_out', '>=', Carbon::today());
                 });
             } elseif ($request->status === 'booked') {
                 $query->whereHas('bookings', function ($q) {
-                    $q->whereIn('status', ['confirmed', 'pending'])
+                    $q->whereIn('status', ['bayar', 'pending'])
                       ->where('tgl_check_out', '>=', Carbon::today());
                 });
             }
@@ -81,8 +81,8 @@ class RoomController extends Controller
         // Fetch booked dates
         $bookedDates = \App\Models\Booking::where('room_id', $room->id)
             ->where(function ($query) {
-                $query->whereIn('status', ['confirmed', 'pending', 'bayar']) // Include 'bayar' if used
-                      ->whereNotIn('status', ['batal', 'cancelled']);
+                $query->whereIn('status', ['bayar', 'pending']) // Include 'bayar' if used
+                      ->whereNotIn('status', ['batal']);
             })
             ->where('tgl_check_out', '>=', Carbon::today())
             ->get(['tgl_check_in', 'tgl_check_out'])
@@ -109,7 +109,7 @@ class RoomController extends Controller
             $user = $auth->user();
             $availableDiscounts = \App\Models\Discount::where(function ($query) {
                     $query->whereNull('expires_at')
-                          ->orWhere('expires_at', '>=', Carbon::today());
+                           ->orWhere('expires_at', '>=', Carbon::today());
                 })
                 ->whereHas('users', function ($query) use ($user) {
                     $query->where('user_id', $user->id)
@@ -125,7 +125,7 @@ class RoomController extends Controller
     {
         // Check if room has any active bookings (confirmed or pending) in the future
         $activeBookings = \App\Models\Booking::where('room_id', $room->id)
-            ->whereIn('status', ['confirmed', 'pending'])
+            ->whereIn('status', ['bayar', 'pending'])
             ->where('tgl_check_out', '>=', Carbon::today())
             ->count();
 
