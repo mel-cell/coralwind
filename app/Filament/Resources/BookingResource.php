@@ -23,41 +23,61 @@ class BookingResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->required(),
-                Forms\Components\Select::make('room_id')
-                    ->relationship('room', 'nama_kamar')
-                    ->required(),
-                Forms\Components\DatePicker::make('tgl_check_in')
-                    ->required(),
-                Forms\Components\DatePicker::make('tgl_check_out')
-                    ->required(),
-                Forms\Components\TextInput::make('jumlah_kamar')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
-                Forms\Components\TextInput::make('total_harga')
-                    ->required()
-                    ->numeric()
-                    ->prefix('Rp'),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'bayar' => 'Bayar',
-                        'selesai' => 'Selesai',
-                        'batal' => 'Batal',
-                    ])
-                    ->required(),
-                Forms\Components\Select::make('payment_method')
-                    ->options([
-                        'pay_at_hotel' => 'Pay at Hotel',
-                        'credit_card' => 'Credit Card',
-                    ])
-                    ->required()
-                    ->reactive(),
-                Forms\Components\TextInput::make('credit_card_number')
-                    ->hidden(fn (Forms\Get $get) => $get('payment_method') !== 'credit_card'),
+                Forms\Components\Section::make('Guest Information')
+                    ->schema([
+                        Forms\Components\Select::make('user_id')
+                            ->relationship('user', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('nik')
+                            ->label('NIK (National ID)')
+                            ->required()
+                            ->maxLength(20),
+                        Forms\Components\TextInput::make('no_hp')
+                            ->label('Phone Number')
+                            ->tel()
+                            ->required()
+                            ->maxLength(15),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Booking Details')
+                    ->schema([
+                        Forms\Components\Select::make('room_id')
+                            ->relationship('room', 'nama_kamar')
+                            ->required(),
+                        Forms\Components\DatePicker::make('tgl_check_in')
+                            ->required(),
+                        Forms\Components\DatePicker::make('tgl_check_out')
+                            ->required(),
+                        Forms\Components\TextInput::make('jumlah_kamar')
+                            ->required()
+                            ->numeric()
+                            ->default(1),
+                        Forms\Components\TextInput::make('total_harga')
+                            ->required()
+                            ->numeric()
+                            ->prefix('Rp'),
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'confirmed' => 'Confirmed',
+                                'cancelled' => 'Cancelled',
+                                'completed' => 'Completed',
+                            ])
+                            ->required(),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Payment')
+                    ->schema([
+                        Forms\Components\Select::make('payment_method')
+                            ->options([
+                                'pay_at_hotel' => 'Pay at Hotel',
+                                'credit_card' => 'Credit Card',
+                            ])
+                            ->required()
+                            ->reactive(),
+                        Forms\Components\TextInput::make('credit_card_number')
+                            ->hidden(fn (Forms\Get $get) => $get('payment_method') !== 'credit_card'),
+                    ])->columns(2),
             ]);
     }
 
@@ -66,9 +86,19 @@ class BookingResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Guest'),
+                Tables\Columns\TextColumn::make('nik')
+                    ->searchable()
+                    ->toggleable()
+                    ->label('NIK'),
+                Tables\Columns\TextColumn::make('no_hp')
+                    ->searchable()
+                    ->toggleable()
+                    ->label('Phone'),
                 Tables\Columns\TextColumn::make('room.nama_kamar')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Room'),
                 Tables\Columns\TextColumn::make('tgl_check_in')
                     ->date()
                     ->sortable(),
@@ -82,9 +112,10 @@ class BookingResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
-                        'bayar' => 'info',
-                        'selesai' => 'success',
-                        'batal' => 'danger',
+                        'confirmed' => 'success',
+                        'completed' => 'success',
+                        'cancelled' => 'danger',
+                        default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('payment_method')
                     ->searchable(),

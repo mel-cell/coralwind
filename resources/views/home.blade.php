@@ -12,9 +12,13 @@
             <!-- Left Content -->
             <div class="space-y-8">
                 <div>
-                    <span class="inline-block py-1 px-3 rounded-full bg-[#E0F2F1] text-[#74A6AF] text-sm font-bold tracking-wider mb-4">
+                    <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                    <span class="inline-block py-1 px-3 rounded-full bg-[#E0F2F1] text-[#74A6AF] text-sm font-bold tracking-wider">
                         CORALWIND SUITES
                     </span>
+                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span>Coralwind Suites, Bali</span>
+                    </div>
                     <h1 class="text-6xl md:text-7xl font-bold text-gray-900 leading-tight">
                         Find Out The <br>
                         <span class="text-primary relative">
@@ -261,18 +265,18 @@
 
 <!-- Reviews Section -->
 <section class="py-20 bg-[#F8FAFC] relative overflow-hidden">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
             <h2 class="text-4xl font-bold text-gray-900 mb-4">Guest Experiences</h2>
             <p class="text-xl text-gray-500">What our guests say about their stay</p>
         </div>
 
         @if($highRatedReviews->count() > 0)
-            <div class="grid gap-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 @foreach($highRatedReviews as $review)
-                    <div class="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full">
                         <div class="flex items-center mb-6">
-                            <div class="w-12 h-12 rounded-full bg-[#E0F2F1] flex items-center justify-center text-[#74A6AF] font-bold text-xl mr-4">
+                            <div class="w-12 h-12 rounded-full bg-[#E0F2F1] flex items-center justify-center text-[#74A6AF] font-bold text-xl mr-4 flex-shrink-0">
                                 {{ substr($review->user->name, 0, 1) }}
                             </div>
                             <div>
@@ -286,7 +290,7 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="text-gray-600 italic leading-relaxed">"{{ $review->comment ?? 'No comment provided.' }}"</p>
+                        <p class="text-gray-600 italic leading-relaxed flex-grow">"{{ $review->comment ?? 'No comment provided.' }}"</p>
                     </div>
                 @endforeach
             </div>

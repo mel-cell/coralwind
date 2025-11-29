@@ -19,7 +19,17 @@ class BookingController extends Controller
             'payment_method' => 'required|in:pay_at_hotel,credit_card',
             'credit_card_number' => 'required_if:payment_method,credit_card|nullable|string',
             'discount_id' => 'nullable|exists:discounts,id',
+            'nik' => 'required|string|max:20',
+            'no_hp' => 'required|string|max:15',
         ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Update user's phone number if it's different or empty
+        if ($user->no_hp !== $request->no_hp) {
+            $user->update(['no_hp' => $request->no_hp]);
+        }
 
         $room = Room::findOrFail($request->room_id);
         $checkIn = \Carbon\Carbon::parse($request->tgl_check_in);
@@ -33,7 +43,6 @@ class BookingController extends Controller
         // Apply Discount
         if ($request->discount_id) {
             $discount = \App\Models\Discount::find($request->discount_id);
-            $user = Auth::user();
 
             // Validate discount availability
             $isUsed = $user->discounts()
@@ -56,9 +65,6 @@ class BookingController extends Controller
             }
         }
 
-        // Check availability (simplified for now, relying on frontend blocked dates mostly, but backend check is good practice)
-        // ... (existing availability check logic if needed, but let's trust the flow for now or keep it simple)
-
         Booking::create([
             'user_id' => Auth::id(),
             'room_id' => $request->room_id,
@@ -68,6 +74,8 @@ class BookingController extends Controller
             'total_harga' => $totalPrice,
             'payment_method' => $request->payment_method,
             'credit_card_number' => $request->credit_card_number,
+            'nik' => $request->nik,
+            'no_hp' => $request->no_hp,
             'status' => 'pending',
         ]);
 

@@ -4,6 +4,30 @@
 <!-- Flatpickr CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
+<style>
+    .flatpickr-day.disabled, .flatpickr-day.disabled:hover, .flatpickr-disabled, .flatpickr-disabled:hover {
+        background: #fee2e2 !important;
+        color: #ef4444 !important;
+        text-decoration: line-through;
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: transparent !important;
+    }
+    .flatpickr-day.selected {
+        background: #74A6AF !important;
+        border-color: #74A6AF !important;
+    }
+    .flatpickr-day.startRange, .flatpickr-day.endRange {
+        background: #74A6AF !important;
+        border-color: #74A6AF !important;
+    }
+    .flatpickr-day.inRange {
+        box-shadow: -5px 0 0 #E0F2F1, 5px 0 0 #E0F2F1 !important;
+        background: #E0F2F1 !important;
+        border-color: #E0F2F1 !important;
+        color: #2d3748 !important;
+    }
+</style>
 
 <div class="pt-32 pb-20 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -186,22 +210,28 @@
                             <input type="text" value="{{ Auth::user()->name ?? '' }}" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:border-primary focus:bg-white focus:ring-0 transition-all" readonly>
                         </div>
 
-                        <!-- Check-In -->
+                        <!-- NIK -->
                         <div class="mb-4">
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Check-in Date</label>
-                            <div class="relative">
-                                <input type="text" name="tgl_check_in" id="check_in" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:border-primary focus:bg-white focus:ring-0 transition-all pl-10" placeholder="Select Date" required>
-                                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            </div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">NIK (National ID)</label>
+                            <input type="text" name="nik" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:border-primary focus:bg-white focus:ring-0 transition-all" placeholder="Enter your NIK" required>
                         </div>
 
-                        <!-- Check-Out -->
+                        <!-- Phone Number -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Phone Number</label>
+                            <input type="text" name="no_hp" value="{{ Auth::user()->no_hp ?? '' }}" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:border-primary focus:bg-white focus:ring-0 transition-all" placeholder="Enter your phone number" required>
+                        </div>
+                        
+                        <!-- Date Range Picker -->
                         <div class="mb-6">
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Check-out Date</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Select Dates (Check-in - Check-out)</label>
                             <div class="relative">
-                                <input type="text" name="tgl_check_out" id="check_out" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:border-primary focus:bg-white focus:ring-0 transition-all pl-10" placeholder="Select Date" required disabled>
+                                <input type="text" id="date_range" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-transparent focus:border-primary focus:bg-white focus:ring-0 transition-all pl-10" placeholder="Select Check-in & Check-out Date" required>
                                 <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             </div>
+                            <!-- Hidden inputs for backend -->
+                            <input type="hidden" name="tgl_check_in" id="tgl_check_in">
+                            <input type="hidden" name="tgl_check_out" id="tgl_check_out">
                         </div>
 
                         <!-- Payment Method -->
@@ -274,8 +304,9 @@
     document.addEventListener('DOMContentLoaded', function() {
         const bookedDates = @json($bookedDates);
         const pricePerNight = {{ $room->harga }};
-        const checkInInput = document.getElementById('check_in');
-        const checkOutInput = document.getElementById('check_out');
+        const dateRangeInput = document.getElementById('date_range');
+        const tglCheckInInput = document.getElementById('tgl_check_in');
+        const tglCheckOutInput = document.getElementById('tgl_check_out');
         const totalPriceDisplay = document.getElementById('total_price_display');
         const totalPriceInput = document.getElementById('total_harga_input');
 
@@ -287,23 +318,26 @@
             };
         });
 
-        const fpCheckIn = flatpickr(checkInInput, {
+        const fp = flatpickr(dateRangeInput, {
+            mode: "range",
             minDate: "today",
             disable: disableDates,
             dateFormat: "Y-m-d",
+            showMonths: 1,
             onChange: function(selectedDates, dateStr, instance) {
-                checkOutInput.disabled = false;
-                fpCheckOut.set('minDate', dateStr);
-                calculateTotal();
-            }
-        });
-
-        const fpCheckOut = flatpickr(checkOutInput, {
-            minDate: "today",
-            disable: disableDates,
-            dateFormat: "Y-m-d",
-            onChange: function(selectedDates, dateStr, instance) {
-                calculateTotal();
+                if (selectedDates.length === 2) {
+                    const checkIn = instance.formatDate(selectedDates[0], "Y-m-d");
+                    const checkOut = instance.formatDate(selectedDates[1], "Y-m-d");
+                    
+                    tglCheckInInput.value = checkIn;
+                    tglCheckOutInput.value = checkOut;
+                    
+                    calculateTotal(selectedDates[0], selectedDates[1]);
+                } else {
+                    tglCheckInInput.value = '';
+                    tglCheckOutInput.value = '';
+                    resetTotal();
+                }
             }
         });
 
@@ -330,13 +364,14 @@
         const discountRow = document.getElementById('discount_row');
 
         if(discountSelect) {
-            discountSelect.addEventListener('change', calculateTotal);
+            discountSelect.addEventListener('change', function() {
+                if (fp.selectedDates.length === 2) {
+                    calculateTotal(fp.selectedDates[0], fp.selectedDates[1]);
+                }
+            });
         }
 
-        function calculateTotal() {
-            const checkInDate = fpCheckIn.selectedDates[0];
-            const checkOutDate = fpCheckOut.selectedDates[0];
-
+        function calculateTotal(checkInDate, checkOutDate) {
             if (checkInDate && checkOutDate) {
                 const diffTime = Math.abs(checkOutDate - checkInDate);
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
@@ -363,12 +398,16 @@
                     totalPriceDisplay.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(total);
                     totalPriceInput.value = total;
                 } else {
-                    subtotalDisplay.innerText = 'Rp 0';
-                    totalPriceDisplay.innerText = 'Rp 0';
-                    totalPriceInput.value = 0;
-                    if(discountRow) discountRow.classList.add('hidden');
+                    resetTotal();
                 }
             }
+        }
+
+        function resetTotal() {
+            subtotalDisplay.innerText = 'Rp 0';
+            totalPriceDisplay.innerText = 'Rp 0';
+            totalPriceInput.value = 0;
+            if(discountRow) discountRow.classList.add('hidden');
         }
     });
 </script>

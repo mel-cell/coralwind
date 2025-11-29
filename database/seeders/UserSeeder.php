@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
                 'name' => 'John Doe',
                 'password' => bcrypt('password'),
                 'role' => 'user',
+                'no_hp' => '081234567890',
             ]
         );
     }

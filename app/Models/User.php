@@ -62,4 +62,9 @@ class User extends Authenticatable implements FilamentUser
             ->withPivot('is_used')
             ->withTimestamps();
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

@@ -80,20 +80,33 @@ class RoomController extends Controller
 
         // Fetch booked dates
         $bookedDates = \App\Models\Booking::where('room_id', $room->id)
-            ->whereIn('status', ['confirmed', 'pending'])
+            ->where(function ($query) {
+                $query->whereIn('status', ['confirmed', 'pending', 'bayar']) // Include 'bayar' if used
+                      ->whereNotIn('status', ['batal', 'cancelled']);
+            })
             ->where('tgl_check_out', '>=', Carbon::today())
             ->get(['tgl_check_in', 'tgl_check_out'])
             ->map(function ($booking) {
+                /** @var \App\Models\Booking $booking */
+                /** @var \Carbon\Carbon $checkIn */
+                $checkIn = $booking->tgl_check_in;
+                /** @var \Carbon\Carbon $checkOut */
+                $checkOut = $booking->tgl_check_out;
+
                 return [
-                    'start' => $booking->tgl_check_in->format('Y-m-d'),
-                    'end' => $booking->tgl_check_out->format('Y-m-d'),
+                    'start' => $checkIn->format('Y-m-d'),
+                    'end' => $checkOut->copy()->subDay()->format('Y-m-d'),
                 ];
             });
 
         // Fetch available discounts for authenticated user
+        // Fetch available discounts for authenticated user
         $availableDiscounts = [];
-        if (auth()->check()) {
-            $user = auth()->user();
+        /** @var \Illuminate\Contracts\Auth\Guard $auth */
+        $auth = auth();
+        if ($auth->check()) {
+            /** @var \App\Models\User $user */
+            $user = $auth->user();
             $availableDiscounts = \App\Models\Discount::where(function ($query) {
                     $query->whereNull('expires_at')
                           ->orWhere('expires_at', '>=', Carbon::today());

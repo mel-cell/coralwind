@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])->name('bookings.store');
     Route::get('/riwayat', [\App\Http\Controllers\RiwayatController::class, 'index'])->name('riwayat.index');
     Route::post('/discounts/{id}/claim', [\App\Http\Controllers\DiscountController::class, 'claim'])->name('discounts.claim');
+    Route::post('/discounts/redeem', [\App\Http\Controllers\DiscountController::class, 'redeem'])->name('discounts.redeem');
 });
 
 require __DIR__.'/auth.php';
