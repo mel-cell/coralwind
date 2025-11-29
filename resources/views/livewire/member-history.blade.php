@@ -38,15 +38,15 @@
 
                             <!-- Status (Cols 2) -->
                             <div class="md:col-span-2">
-                                @if($booking->status === 'confirmed')
+                                @if($booking->status === 'bayar')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700 border border-green-100">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span> Confirmed
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span> Paid
                                     </span>
                                 @elseif($booking->status === 'pending')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-yellow-50 text-yellow-700 border border-yellow-100">
                                         <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full mr-1.5"></span> Pending
                                     </span>
-                                @elseif($booking->status === 'cancelled')
+                                @elseif($booking->status === 'batal')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-100">
                                         <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span> Cancelled
                                     </span>
@@ -64,13 +64,13 @@
 
                             <!-- Action / Review Display (Cols 4) -->
                             <div class="md:col-span-4 flex flex-col items-end justify-center gap-2">
-                                @if($booking->status !== 'batal' && $booking->status !== 'cancelled')
+                                @if($booking->status !== 'batal')
                                     <a href="{{ route('bookings.invoice', $booking->id) }}" target="_blank" class="w-full md:w-auto bg-gray-800 text-white px-4 py-1.5 rounded-full font-bold text-xs hover:bg-gray-900 transition-all shadow-sm hover:shadow flex items-center justify-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         Download Invoice
                                     </a>
                                 @endif
-                                @if(!$booking->review && $booking->status === 'confirmed')
+                                @if(!$booking->review && $booking->status === 'selesai')
                                     <button wire:click="openReviewForm({{ $booking->id }})" class="w-full md:w-auto bg-white border border-primary text-primary px-4 py-1.5 rounded-full font-bold text-xs hover:bg-primary hover:text-white transition-all shadow-sm hover:shadow flex items-center justify-center">
                                         Write Review
                                     </button>

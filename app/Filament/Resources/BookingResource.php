@@ -59,9 +59,9 @@ class BookingResource extends Resource
                         Forms\Components\Select::make('status')
                             ->options([
                                 'pending' => 'Pending',
-                                'confirmed' => 'Confirmed',
-                                'cancelled' => 'Cancelled',
-                                'completed' => 'Completed',
+                                'bayar' => 'Paid',
+                                'batal' => 'Cancelled',
+                                'selesai' => 'Completed',
                             ])
                             ->required(),
                     ])->columns(2),
@@ -112,9 +112,9 @@ class BookingResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
-                        'confirmed' => 'success',
-                        'completed' => 'success',
-                        'cancelled' => 'danger',
+                        'bayar' => 'success',
+                        'selesai' => 'success',
+                        'batal' => 'danger',
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('payment_method')
@@ -153,3 +153,4 @@ class BookingResource extends Resource
         ];
     }
 }
+

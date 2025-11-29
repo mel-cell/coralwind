@@ -17,10 +17,10 @@ class BookingController extends Controller
             'tgl_check_out' => 'required|date|after:tgl_check_in',
             'jumlah_kamar' => 'required|integer|min:1',
             'payment_method' => 'required|in:pay_at_hotel,credit_card',
-            'credit_card_number' => 'required_if:payment_method,credit_card|nullable|string',
+            'credit_card_number' => ['required_if:payment_method,credit_card', 'nullable', 'string', 'min:13', 'max:25', 'regex:/^[\d\s\-]+$/'],
             'discount_id' => 'nullable|exists:discounts,id',
-            'nik' => 'required|string|max:20',
-            'no_hp' => 'required|string|max:15',
+            'nik' => ['required', 'string', 'size:16', 'regex:/^[0-9]+$/'],
+            'no_hp' => ['required', 'string', 'min:10', 'max:15', 'regex:/^[\d\+\-\(\) ]+$/'],
         ]);
 
         /** @var \App\Models\User $user */
@@ -37,6 +37,26 @@ class BookingController extends Controller
         $days = $checkIn->diffInDays($checkOut);
         
         if ($days < 1) $days = 1;
+
+        // Check for overlapping bookings
+        $isBooked = Booking::where('room_id', $request->room_id)
+            ->where(function ($query) {
+                $query->where('status', 'bayar')
+                      ->orWhere('status', 'pending');
+            })
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('tgl_check_in', [$request->tgl_check_in, $request->tgl_check_out])
+                      ->orWhereBetween('tgl_check_out', [$request->tgl_check_in, $request->tgl_check_out])
+                      ->orWhere(function ($q) use ($request) {
+                          $q->where('tgl_check_in', '<=', $request->tgl_check_in)
+                            ->where('tgl_check_out', '>=', $request->tgl_check_out);
+                      });
+            })
+            ->exists();
+
+        if ($isBooked) {
+            return back()->withErrors(['room_id' => 'Kamar ini sudah dipesan pada tanggal yang dipilih. Silakan pilih tanggal atau kamar lain.'])->withInput();
+        }
 
         $totalPrice = $room->harga * $days;
 
@@ -76,7 +96,7 @@ class BookingController extends Controller
             'credit_card_number' => $request->credit_card_number,
             'nik' => $request->nik,
             'no_hp' => $request->no_hp,
-            'status' => 'pending',
+            'status' => $request->payment_method === 'credit_card' ? 'bayar' : 'pending',
         ]);
 
         return redirect()->route('riwayat.index')->with('success', 'Booking created successfully!');

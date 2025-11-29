@@ -45,10 +45,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])->name('bookings.store');
+    Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])->name('bookings.store')->middleware('throttle:3,1');
     Route::get('/riwayat', [\App\Http\Controllers\RiwayatController::class, 'index'])->name('riwayat.index');
-    Route::post('/discounts/{id}/claim', [\App\Http\Controllers\DiscountController::class, 'claim'])->name('discounts.claim');
-    Route::post('/discounts/redeem', [\App\Http\Controllers\DiscountController::class, 'redeem'])->name('discounts.redeem');
+    Route::post('/discounts/{id}/claim', [\App\Http\Controllers\DiscountController::class, 'claim'])->name('discounts.claim')->middleware('throttle:6,1');
+    Route::post('/discounts/redeem', [\App\Http\Controllers\DiscountController::class, 'redeem'])->name('discounts.redeem')->middleware('throttle:6,1');
     
     // Invoice & Verification
     Route::get('/bookings/{booking}/invoice', [\App\Http\Controllers\BookingController::class, 'downloadInvoice'])->name('bookings.invoice');
