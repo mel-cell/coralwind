@@ -49,6 +49,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/riwayat', [\App\Http\Controllers\RiwayatController::class, 'index'])->name('riwayat.index');
     Route::post('/discounts/{id}/claim', [\App\Http\Controllers\DiscountController::class, 'claim'])->name('discounts.claim');
     Route::post('/discounts/redeem', [\App\Http\Controllers\DiscountController::class, 'redeem'])->name('discounts.redeem');
+    
+    // Invoice & Verification
+    Route::get('/bookings/{booking}/invoice', [\App\Http\Controllers\BookingController::class, 'downloadInvoice'])->name('bookings.invoice');
+    Route::get('/admin/verify/{booking}', [\App\Http\Controllers\BookingController::class, 'verify'])->name('admin.verify')->middleware('signed');
 });
 
 require __DIR__.'/auth.php';

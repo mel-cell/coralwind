@@ -30,7 +30,7 @@ class ReviewResource extends Resource
                     ->relationship('booking', 'id')
                     ->required(),
                 Forms\Components\Select::make('room_id')
-                    ->relationship('room', 'name')
+                    ->relationship('room', 'nama_kamar')
                     ->required(),
                 Forms\Components\TextInput::make('rating')
                     ->required()
@@ -52,7 +52,7 @@ class ReviewResource extends Resource
                 Tables\Columns\TextColumn::make('booking.id')
                     ->label('Booking ID')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('room.name')
+                Tables\Columns\TextColumn::make('room.nama_kamar')
                     ->label('Room')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rating')

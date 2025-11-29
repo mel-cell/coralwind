@@ -81,4 +81,42 @@ class BookingController extends Controller
 
         return redirect()->route('riwayat.index')->with('success', 'Booking created successfully!');
     }
+
+    public function downloadInvoice(Booking $booking)
+    {
+        if (Auth::id() !== $booking->user_id && Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $verificationUrl = \Illuminate\Support\Facades\URL::signedRoute('admin.verify', ['booking' => $booking->id]);
+        
+        $qrcode = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($verificationUrl);
+
+        // Return HTML view directly for browser printing
+        return view('pdf.invoice', compact('booking', 'qrcode'));
+    }   
+
+    public function verify(Request $request, Booking $booking)
+    {
+        // Ensure user is admin
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'Unauthorized action. Only admins can verify bookings.');
+        }
+
+        if ($booking->status === 'selesai') {
+            return view('admin.scan-result', [
+                'booking' => $booking,
+                'status' => 'warning',
+                'message' => 'Booking ini sudah diverifikasi sebelumnya.'
+            ]);
+        }
+
+        $booking->update(['status' => 'selesai']);
+
+        return view('admin.scan-result', [
+            'booking' => $booking,
+            'status' => 'success',
+            'message' => 'Verifikasi Berhasil! Booking telah ditandai selesai.'
+        ]);
+    }
 }
