@@ -170,3 +170,12 @@
         </div>
     @endif
 </div>
+
+@if(session()->has('new_booking_id'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Open invoice in new tab
+            window.open("{{ route('bookings.invoice', session('new_booking_id')) }}", '_blank');
+        });
+    </script>
+@endif

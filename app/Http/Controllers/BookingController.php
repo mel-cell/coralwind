@@ -93,7 +93,7 @@ class BookingController extends Controller
             }
         }
 
-        Booking::create([
+        $booking = Booking::create([
             'user_id' => Auth::id(),
             'room_id' => $request->room_id,
             'tgl_check_in' => $request->tgl_check_in,
@@ -107,7 +107,7 @@ class BookingController extends Controller
             'status' => $request->payment_method === 'credit_card' ? 'bayar' : 'pending',
         ]);
 
-        return redirect()->route('riwayat.index')->with('success', 'Booking created successfully!');
+        return redirect()->route('riwayat.index')->with('success', 'Booking created successfully!')->with('new_booking_id', $booking->id);
     }
 
     public function downloadInvoice(Booking $booking)
